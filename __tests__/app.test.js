@@ -138,7 +138,7 @@ describe("app", () => {
     });
   });
 
-  describe("GET - /api/users", () => {
+  describe("GET /api/users", () => {
     test("status: 200 - responds with array of users objects with username property", () => {
       return request(app)
         .get("/api/users")
@@ -157,6 +157,47 @@ describe("app", () => {
     test("status: 404 - responds with path not found msg for incorrect path ", () => {
       return request(app)
         .get("/api/userz")
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("path not found");
+        });
+    });
+  });
+  describe("GET /api/articles", () => {
+    test("status: 200 - responds with array of articles objects with author, title, article_id, topic, created_at, votes properties  ", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles).toHaveLength(12);
+          res.body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+              })
+            );
+          });
+        });
+    });
+    test("status: 200 - responds with array of articles sorted by date in descending order ", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles).toHaveLength(12);
+          expect(res.body.articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+    test(`status: 404 - responds with "path not found" msg for incorrect path`, () => {
+      return request(app)
+        .get("/api/articlesz")
         .expect(404)
         .then((res) => {
           expect(res.body.msg).toBe("path not found");
