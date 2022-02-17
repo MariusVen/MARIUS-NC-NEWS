@@ -17,3 +17,23 @@ exports.selectArticleById = (articleId) => {
       return articleArray[0];
     });
 };
+
+exports.updateArticleByID = (voteToAdd, article_id) => {
+  const newVote = voteToAdd.inc_votes;
+  if (newVote === undefined) {
+    return Promise.reject({ status: 400, msg: "missing required fields" });
+  } else if (typeof newVote != "number") {
+    return Promise.reject({
+      status: 400,
+      msg: "input property is incorrect type",
+    });
+  }
+  return db
+    .query(
+      "UPDATE articles SET votes = votes+ $1 WHERE article_id=$2 RETURNING *;",
+      [newVote, article_id]
+    )
+    .then((result) => {
+      return result.rows[0];
+    });
+};
