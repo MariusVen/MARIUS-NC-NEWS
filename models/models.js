@@ -6,7 +6,16 @@ exports.fetchTopics = () => {
   });
 };
 
-exports.selectArticleById = (articleId) => {
+const getComment = (input) => {
+  return input;
+};
+
+exports.selectArticleById = async (articleId) => {
+  const commentCount = await db
+    .query("SELECT * FROM comments WHERE article_id=$1", [articleId])
+    .then((result) => {
+      return result.rows.length;
+    });
   return db
     .query("SELECT * FROM articles WHERE article_id=$1", [articleId])
     .then((result) => {
@@ -14,6 +23,7 @@ exports.selectArticleById = (articleId) => {
       if (articleArray.length === 0) {
         return Promise.reject({ status: 404, msg: "No article found" });
       }
+      articleArray[0].comment_count = commentCount;
       return articleArray[0];
     });
 };
