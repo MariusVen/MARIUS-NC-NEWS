@@ -47,3 +47,12 @@ exports.fetchUsers = () => {
     return rows;
   });
 };
+exports.fetchArticles = () => {
+  return db
+    .query(
+      "SELECT author, title, article_id, topic, created_at, votes FROM articles ORDER BY created_at desc"
+    )
+    .then(({ rows }) => {
+      return rows;
+    });
+};
