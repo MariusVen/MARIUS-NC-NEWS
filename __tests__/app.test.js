@@ -55,7 +55,7 @@ describe("app", () => {
     });
     test(`status: 404 - responds with "path not found message" for incorrect path `, () => {
       return request(app)
-        .get("/api/topikss")
+        .get("/api/arcticlesz")
         .expect(404)
         .then((res) => {
           expect(res.body.msg).toBe("path not found");
@@ -95,6 +95,25 @@ describe("app", () => {
             created_at: "2020-06-06T09:10:00.000Z",
             votes: res.body.article.votes,
           });
+        });
+    });
+    test(`status: 404 - responds with "path not found message" for incorrect path `, () => {
+      return request(app)
+        .patch("/api/articlesz")
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("path not found");
+        });
+    });
+    test(`status: 404 - responds with "no article found" message for valid but non-existend article id`, () => {
+      const article_id = 100;
+      const newVote = { inc_votes: 10 };
+      return request(app)
+        .patch(`/api/articles/${article_id}`)
+        .send(newVote)
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("No article found");
         });
     });
     test(`status: 400 - responds with "input missing required fields" message if input missing required fields`, () => {

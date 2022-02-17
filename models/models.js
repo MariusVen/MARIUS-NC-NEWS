@@ -34,6 +34,10 @@ exports.updateArticleByID = (voteToAdd, article_id) => {
       [newVote, article_id]
     )
     .then((result) => {
+      const articleArray = result.rows;
+      if (articleArray.length === 0) {
+        return Promise.reject({ status: 404, msg: "No article found" });
+      }
       return result.rows[0];
     });
 };
