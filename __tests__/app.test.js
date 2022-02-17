@@ -9,7 +9,7 @@ beforeEach(() => seed(data));
 
 describe("app", () => {
   describe("GET - /api/topics", () => {
-    test("status: 200, responds with array of topic objects with slug & description properties", () => {
+    test("status: 200 - responds with array of topic objects with slug & description properties", () => {
       return request(app)
         .get("/api/topics")
         .expect(200)
@@ -116,6 +116,31 @@ describe("app", () => {
         .then((res) =>
           expect(res.body.msg).toBe("input property is incorrect type")
         );
+    });
+  });
+  describe("GET - /api/users", () => {
+    test("status: 200 - responds with array of users objects with username property", () => {
+      return request(app)
+        .get("/api/users")
+        .expect(200)
+        .then((res) => {
+          expect(res.body.users).toHaveLength(4);
+          res.body.users.forEach((user) => {
+            expect(user).toEqual(
+              expect.objectContaining({
+                username: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+    test("status: 404 - responds with path not found msg for incorrect path ", () => {
+      return request(app)
+        .get("/api/userz")
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("path not found");
+        });
     });
   });
 });

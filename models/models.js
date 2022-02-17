@@ -37,3 +37,9 @@ exports.updateArticleByID = (voteToAdd, article_id) => {
       return result.rows[0];
     });
 };
+
+exports.fetchUsers = () => {
+  return db.query("SELECT username FROM users").then(({ rows }) => {
+    return rows;
+  });
+};
