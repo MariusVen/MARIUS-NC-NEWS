@@ -253,6 +253,7 @@ describe("app", () => {
         .expect(200)
         .then((res) => {
           expect(res.body.comments).toHaveLength(0);
+          expect(res.body.comments).toEqual([]);
         });
     });
     test(`status: 404 - responds with "no article found" message for valid but non-existend id`, () => {
