@@ -8,7 +8,16 @@ exports.fetchTopics = () => {
 
 exports.selectArticleById = (articleId) => {
   return db
-    .query("SELECT * FROM articles WHERE article_id=$1", [articleId])
+    .query(
+      `SELECT articles.*, 
+       CAST(COUNT(comments.article_id) AS INT) AS comment_count 
+       FROM articles 
+       LEFT JOIN comments 
+       ON comments.article_id = articles.article_id 
+       WHERE articles.article_id=$1
+       GROUP BY articles.article_id;`,
+      [articleId]
+    )
     .then((result) => {
       const articleArray = result.rows;
       if (articleArray.length === 0) {
