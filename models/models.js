@@ -67,7 +67,15 @@ exports.fetchArticles = () => {
     });
 };
 
-exports.fetchComments = (articleId) => {
+exports.fetchComments = async (articleId) => {
+  await db
+    .query("SELECT * FROM articles WHERE article_Id=$1", [articleId])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "No article found" });
+      }
+    });
+
   return db
     .query(
       "SELECT author, created_at, votes, body, comment_id FROM comments WHERE article_Id=$1",
@@ -76,7 +84,7 @@ exports.fetchComments = (articleId) => {
     .then(({ rows }) => {
       const commentArray = rows;
       if (commentArray.length === 0) {
-        return Promise.reject({ status: 404, msg: "No article found" });
+        return [];
       }
       return commentArray;
     });

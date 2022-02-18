@@ -246,6 +246,15 @@ describe("app", () => {
           });
         });
     });
+    test("status: 200 - responds with empty array if article exists, but doesn't have associates comments", () => {
+      const article_id = 2;
+      return request(app)
+        .get(`/api/articles/${article_id}/comments`)
+        .expect(200)
+        .then((res) => {
+          expect(res.body.comments).toHaveLength(0);
+        });
+    });
     test(`status: 404 - responds with "no article found" message for valid but non-existend id`, () => {
       const article_id = 100;
       return request(app)
