@@ -41,16 +41,17 @@ describe("app", () => {
         .get(`/api/articles/${article_id}`)
         .expect(200)
         .then((res) => {
-          expect(res.body.article).toEqual({
-            author: "butter_bridge",
-            title: "They're not exactly dogs, are they?",
-            article_id: 9,
-            body: "Well? Think about it.",
-            topic: "mitch",
-            created_at: "2020-06-06T09:10:00.000Z",
-            votes: res.body.article.votes,
-            comment_count: 2,
-          });
+          expect(res.body.article).toEqual(
+            expect.objectContaining({
+              author: "butter_bridge",
+              title: "They're not exactly dogs, are they?",
+              article_id: 9,
+              body: "Well? Think about it.",
+              topic: "mitch",
+              created_at: "2020-06-06T09:10:00.000Z",
+              votes: res.body.article.votes,
+            })
+          );
         });
     });
     test("status: 200 - responds with correct article including comment_count property ", () => {
@@ -59,16 +60,18 @@ describe("app", () => {
         .get(`/api/articles/${article_id}`)
         .expect(200)
         .then((res) => {
-          expect(res.body.article).toEqual({
-            author: "butter_bridge",
-            title: "They're not exactly dogs, are they?",
-            article_id: 9,
-            body: "Well? Think about it.",
-            topic: "mitch",
-            created_at: "2020-06-06T09:10:00.000Z",
-            votes: res.body.article.votes,
-            comment_count: 2,
-          });
+          expect(res.body.article).toEqual(
+            expect.objectContaining({
+              author: "butter_bridge",
+              title: "They're not exactly dogs, are they?",
+              article_id: 9,
+              body: "Well? Think about it.",
+              topic: "mitch",
+              created_at: "2020-06-06T09:10:00.000Z",
+              votes: res.body.article.votes,
+              comment_count: 2,
+            })
+          );
         });
     });
     test(`status: 404 - responds with "path not found message" for incorrect path `, () => {
