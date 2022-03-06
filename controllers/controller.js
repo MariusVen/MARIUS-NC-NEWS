@@ -4,6 +4,8 @@ const {
   updateArticleByID,
   fetchUsers,
   fetchArticles,
+  fetchComments,
+  checkArticleId,
 } = require("../models/models");
 
 exports.getTopics = (req, res) => {
@@ -45,4 +47,16 @@ exports.getArticles = (req, res) => {
   fetchArticles().then((articles) => {
     res.status(200).send({ articles: articles });
   });
+};
+
+exports.getComments = (req, res, next) => {
+  const articleId = req.params.article_id;
+  Promise.all([fetchComments(articleId), checkArticleId(articleId)])
+    .then((comments) => {
+      console.log(comments[0]);
+      res.status(200).send({ comments: comments[0] });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };

@@ -56,6 +56,7 @@ exports.fetchUsers = () => {
     return rows;
   });
 };
+
 exports.fetchArticles = () => {
   return db
     .query(
@@ -63,5 +64,30 @@ exports.fetchArticles = () => {
     )
     .then(({ rows }) => {
       return rows;
+    });
+};
+exports.fetchComments = (articleId) => {
+  return db
+    .query(
+      "SELECT author, created_at, votes, body, comment_id FROM comments WHERE article_Id=$1",
+      [articleId]
+    )
+    .then(({ rows }) => {
+      const commentArray = rows;
+      if (commentArray.length === 0) {
+        return [];
+      }
+      return commentArray;
+    });
+};
+
+exports.checkArticleId = (articleId) => {
+  return db
+    .query("SELECT * FROM articles WHERE article_Id=$1", [articleId])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        console.table(rows);
+        return Promise.reject({ status: 404, msg: "No article found" });
+      }
     });
 };
