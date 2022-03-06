@@ -205,6 +205,27 @@ describe("app", () => {
           });
         });
     });
+    test("status: 200 - responds with array of article objects including comment_count property  ", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles).toHaveLength(12);
+          res.body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: expect.any(String),
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+                comment_count: expect.any(Number),
+              })
+            );
+          });
+        });
+    });
     test("status: 200 - responds with array of articles sorted by date in descending order ", () => {
       return request(app)
         .get("/api/articles")
