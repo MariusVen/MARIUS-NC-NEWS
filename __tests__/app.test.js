@@ -226,7 +226,7 @@ describe("app", () => {
           });
         });
     });
-    test("status: 200 - responds with array of articles sorted by date in descending order ", () => {
+    test("Status 200, default sort & order: `created_at`, `desc` ", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
@@ -237,12 +237,15 @@ describe("app", () => {
           });
         });
     });
-    test(`status: 404 - responds with "path not found" msg for incorrect path`, () => {
+    test.only("Status 200, accepts `sort_by` query, e.g. `?sort_by=votes`", () => {
       return request(app)
-        .get("/api/articlez")
-        .expect(404)
+        .get("/api/articles?sort_by=votes")
+        .expect(200)
         .then((res) => {
-          expect(res.body.msg).toBe("path not found");
+          expect(res.body.articles).toHaveLength(12);
+          expect(res.body.articles).toBeSortedBy("votes", {
+            descending: true,
+          });
         });
     });
   });
@@ -293,6 +296,111 @@ describe("app", () => {
         .expect(400)
         .then((res) => {
           expect(res.body.msg).toBe("bad request");
+        });
+    });
+  });
+  describe("POST /api/articles/:article_id/comments", () => {
+    test("status: 201 - responds with added comment ", () => {
+      const article_id = 9;
+      const data = { body: "testing", username: "butter_bridge" };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(data)
+        .expect(201)
+        .then((res) => {
+          expect(res.body.comment).toEqual({
+            author: "butter_bridge",
+            article_id: 9,
+            body: "testing",
+            comment_id: res.body.comment.comment_id,
+            created_at: res.body.comment.created_at,
+            votes: res.body.comment.votes,
+          });
+          expect(res.body.comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+            })
+          );
+        });
+    });
+    test(`Status: 400 - invalid ID, e.g. string of "not-an-id"`, () => {
+      const article_id = "not-an-id";
+      const data = { body: "testing", username: "butter_bridge" };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(data)
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).toBe("bad request");
+        });
+    });
+    test(`status: 404 - responds with "no article found" message for valid but non-existend article id`, () => {
+      const article_id = 100;
+      const data = { body: "testing", username: "butter_bridge" };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(data)
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("No article found");
+        });
+    });
+
+    test(`status: 400 - missing required field(s), e.g. no username or body properties`, () => {
+      const article_id = 9;
+      const data = { body: "testing" };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(data)
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).toBe("missing username property");
+        });
+    });
+    // test(`status 404 - username does not exist`, () => {
+    //   const article_id = 9;
+    //   const data = { body: "testing", username: "randomUsername" };
+    //   return request(app)
+    //     .post(`/api/articles/${article_id}/comments`)
+    //     .send(data)
+    //     .expect(400)
+    //     .then((res) => {
+    //       expect(res.body.msg).toBe("username does not exist");
+    //     });
+    // });
+    test("status: 201 - ignores unnecessary properties ", () => {
+      const article_id = 9;
+      const data = {
+        body: "testing",
+        username: "butter_bridge",
+        color: "blue",
+      };
+      return request(app)
+        .post(`/api/articles/${article_id}/comments`)
+        .send(data)
+        .expect(201)
+        .then((res) => {
+          expect(res.body.comment).toEqual({
+            author: "butter_bridge",
+            article_id: 9,
+            body: "testing",
+            comment_id: res.body.comment.comment_id,
+            created_at: res.body.comment.created_at,
+            votes: res.body.comment.votes,
+          });
+          expect(res.body.comment).toEqual(
+            expect.objectContaining({
+              comment_id: expect.any(Number),
+              votes: expect.any(Number),
+              created_at: expect.any(String),
+              author: expect.any(String),
+              body: expect.any(String),
+            })
+          );
         });
     });
   });
