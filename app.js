@@ -6,6 +6,7 @@ const {
   getUsers,
   getArticles,
   getComments,
+  postComments,
 } = require("./controllers/controller");
 const { handlePsqlErrors, handleCustoms, handle500s } = require("./errors");
 const app = express();
@@ -18,6 +19,7 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleById);
 app.get("/api/articles/:article_id/comments", getComments);
 app.patch("/api/articles/:article_id", getUpdatedArticleById);
+app.post("/api/articles/:article_id/comments", postComments);
 
 app.use(handlePsqlErrors);
 app.use(handleCustoms);

@@ -6,6 +6,9 @@ const {
   fetchArticles,
   fetchComments,
   checkArticleId,
+  addComment,
+  checkCommentKeys,
+  checkUserName,
 } = require("../models/models");
 
 exports.getTopics = (req, res) => {
@@ -54,6 +57,25 @@ exports.getComments = (req, res, next) => {
   Promise.all([fetchComments(articleId), checkArticleId(articleId)])
     .then((comments) => {
       res.status(200).send({ comments: comments[0] });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postComments = (req, res, next) => {
+  const articleId = req.params.article_id;
+  const body = req.body.body;
+  const username = req.body.username;
+  const keys = ["username", "body"];
+  Promise.all([
+    checkCommentKeys(keys, req.body),
+    // checkUserName(username, articleId),
+    checkArticleId(articleId),
+    addComment(username, body, articleId),
+  ])
+    .then((comment) => {
+      res.status(201).send({ comment: comment[2] });
     })
     .catch((err) => {
       next(err);

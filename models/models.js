@@ -75,7 +75,7 @@ exports.fetchArticles = () => {
 exports.fetchComments = (articleId) => {
   return db
     .query(
-      "SELECT author, created_at, votes, body, comment_id FROM comments WHERE article_Id=$1",
+      "SELECT author, created_at, votes, body, comment_id, article_id FROM comments WHERE article_Id=$1 ",
       [articleId]
     )
     .then(({ rows }) => {
@@ -92,8 +92,43 @@ exports.checkArticleId = (articleId) => {
     .query("SELECT * FROM articles WHERE article_Id=$1", [articleId])
     .then(({ rows }) => {
       if (rows.length === 0) {
-        console.table(rows);
         return Promise.reject({ status: 404, msg: "No article found" });
       }
+    });
+};
+
+exports.checkCommentKeys = (keys, object) => {
+  const newArr = [];
+  for (let i = 0; i < keys.length; i++) {
+    if (!object.hasOwnProperty(keys[i])) {
+      return Promise.reject({
+        status: 400,
+        msg: `missing ${keys[i]} property`,
+      });
+    }
+  }
+};
+
+exports.checkUserName = (username, articleId) => {
+  return db
+    .query("SELECT * FROM articles WHERE article_Id=$1", [articleId])
+    .then(({ rows }) => {
+      console.log(rows);
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "No article found" });
+      }
+    });
+};
+
+exports.addComment = (username, body, articleId) => {
+  return db
+    .query(
+      "INSERT INTO comments (author, body, article_id) VALUES($1, $2, $3) RETURNING *;",
+      [username, body, articleId]
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "No article found" });
+      } else return rows[0];
     });
 };
