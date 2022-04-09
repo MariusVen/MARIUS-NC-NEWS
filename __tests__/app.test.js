@@ -184,7 +184,7 @@ describe("app", () => {
         });
     });
   });
-  describe("GET /api/articles", () => {
+  describe.only("GET /api/articles", () => {
     test("status: 200 - responds with array of articles objects with author, title, article_id, topic, created_at, votes properties  ", () => {
       return request(app)
         .get("/api/articles")
@@ -226,7 +226,7 @@ describe("app", () => {
           });
         });
     });
-    test("Status 200, default sort & order: `created_at`, `desc` ", () => {
+    test("status: 200 - default sort & order: `created_at`, `desc` ", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
@@ -237,7 +237,7 @@ describe("app", () => {
           });
         });
     });
-    test.only("Status 200, accepts `sort_by` query, e.g. `?sort_by=votes`", () => {
+    test("status: 200 - accepts `sort_by` query, e.g. `?sort_by=votes`", () => {
       return request(app)
         .get("/api/articles?sort_by=votes")
         .expect(200)
@@ -246,6 +246,69 @@ describe("app", () => {
           expect(res.body.articles).toBeSortedBy("votes", {
             descending: true,
           });
+        });
+    });
+    test("status: 200 - accepts `order` query, e.g. `?order=desc`", () => {
+      return request(app)
+        .get("/api/articles?order_by=desc")
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles).toHaveLength(12);
+          expect(res.body.articles).toBeSortedBy("created_at", {
+            descending: true,
+          });
+        });
+    });
+    test("status: 200 - accepts `topic` query, e.g. `?topic=cats`", () => {
+      return request(app)
+        .get("/api/articles/?topic=cats")
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles).toHaveLength(1);
+          res.body.articles.forEach((article) => {
+            expect(article).toEqual(
+              expect.objectContaining({
+                author: expect.any(String),
+                title: expect.any(String),
+                article_id: expect.any(Number),
+                topic: "cats",
+                created_at: expect.any(String),
+                votes: expect.any(Number),
+              })
+            );
+          });
+        });
+    });
+    test("status: 400 - invalid `sort_by` query, e.g. `?sort_by=bananas` ", () => {
+      return request(app)
+        .get(`/api/articles/?sort_by=bananas`)
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).toBe("invalid `sort_by` query");
+        });
+    });
+    test("status: 400 - invalid `order` query, e.g. `?order=bananas` ", () => {
+      return request(app)
+        .get(`/api/articles/?order_by=bananas`)
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).toBe("invalid `order` query");
+        });
+    });
+    test("status: 404 - non-existent `topic` query, e.g. `?topic=bananas`", () => {
+      return request(app)
+        .get(`/api/articles/?topic=bananas`)
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("non-existent `topic` query");
+        });
+    });
+    test("Status 200. valid `topic` query, but has no articles responds with an empty array of articles, e.g. `?topic=paper`", () => {
+      return request(app)
+        .get("/api/articles/?topic=paper")
+        .expect(200)
+        .then((res) => {
+          expect(res.body.articles).toEqual([]);
         });
     });
   });

@@ -9,6 +9,8 @@ const {
   addComment,
   checkCommentKeys,
   checkUserName,
+  checkQueries,
+  checkTopicValid,
 } = require("../models/models");
 
 exports.getTopics = (req, res) => {
@@ -46,10 +48,21 @@ exports.getUsers = (req, res) => {
   });
 };
 
-exports.getArticles = (req, res) => {
-  fetchArticles().then((articles) => {
-    res.status(200).send({ articles: articles });
-  });
+exports.getArticles = (req, res, next) => {
+  const sort = req.query.sort_by;
+  const order = req.query.order_by;
+  const topic = req.query.topic;
+
+  Promise.all([
+    checkQueries(sort, order, topic),
+    fetchArticles(sort, order, topic),
+  ])
+    .then((articles) => {
+      res.status(200).send({ articles: articles[1] });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.getComments = (req, res, next) => {
