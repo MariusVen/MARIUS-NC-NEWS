@@ -29,7 +29,9 @@ exports.selectArticleById = (articleId) => {
 
 exports.updateArticleByID = (voteToAdd, article_id) => {
   const newVote = voteToAdd.inc_votes;
-  if (newVote === undefined) {
+  if (isNaN(+article_id)) {
+    return Promise.reject({ status: 400, msg: "invalid article ID" });
+  } else if (newVote === undefined) {
     return Promise.reject({ status: 400, msg: "missing required fields" });
   } else if (isNaN(+newVote)) {
     return Promise.reject({
@@ -136,12 +138,12 @@ exports.checkCommentKeys = (keys, object) => {
   }
 };
 
-exports.checkUserName = (username, articleId) => {
+exports.checkUserName = (username) => {
   return db
-    .query("SELECT * FROM articles WHERE article_Id=$1", [articleId])
+    .query("SELECT * FROM users WHERE username=$1", [username])
     .then(({ rows }) => {
       if (rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "No article found" });
+        return Promise.reject({ status: 404, msg: "username does not exist" });
       }
     });
 };

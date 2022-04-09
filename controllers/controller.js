@@ -85,12 +85,12 @@ exports.postComments = (req, res, next) => {
   const keys = ["username", "body"];
   Promise.all([
     checkCommentKeys(keys, req.body),
-    // checkUserName(username, articleId),
+    checkUserName(username),
     checkArticleId(articleId),
     addComment(username, body, articleId),
   ])
     .then((comment) => {
-      res.status(201).send({ comment: comment[2] });
+      res.status(201).send({ comment: comment[3] });
     })
     .catch((err) => {
       next(err);
