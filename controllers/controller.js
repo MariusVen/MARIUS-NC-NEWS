@@ -15,6 +15,8 @@ const {
   checkCommentById,
 } = require("../models/models");
 
+const endPoints = require("../endpoints.json");
+
 exports.getTopics = (req, res) => {
   fetchTopics().then((topics) => {
     res.status(200).send({ topics: topics });
@@ -103,6 +105,15 @@ exports.deleteComment = (req, res, next) => {
     .then((deletedComment) => {
       res.status(204).send(deletedComment);
     })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getEndPoints = (req, res, next) => {
+  res
+    .status(200)
+    .send(endPoints)
     .catch((err) => {
       next(err);
     });
