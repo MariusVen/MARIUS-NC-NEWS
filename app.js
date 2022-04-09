@@ -8,12 +8,14 @@ const {
   getComments,
   postComments,
   deleteComment,
+  getEndPoints,
 } = require("./controllers/controller");
 const { handlePsqlErrors, handleCustoms, handle500s } = require("./errors");
 const app = express();
 
 app.use(express.json());
 
+app.get("/api/", getEndPoints);
 app.get("/api/topics", getTopics);
 app.get("/api/users", getUsers);
 app.get("/api/articles", getArticles);

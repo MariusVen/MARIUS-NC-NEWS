@@ -3,6 +3,7 @@ const app = require("../app");
 const data = require("../db/data/test-data");
 const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
+const endPoints = require("../endpoints.json");
 
 afterAll(() => db.end());
 beforeEach(() => seed(data));
@@ -503,6 +504,16 @@ describe("app", () => {
         .expect(400)
         .then((res) => {
           expect(res.body.msg).toBe("invalid ID, e.g not-an-id");
+        });
+    });
+  });
+  describe("GET /api", () => {
+    test("Status 200, JSON describing all the available endpoints ", () => {
+      return request(app)
+        .get("/api")
+        .expect(200)
+        .then((res) => {
+          expect(res.body).toEqual(endPoints);
         });
     });
   });
