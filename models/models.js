@@ -57,7 +57,7 @@ exports.fetchUsers = () => {
   });
 };
 
-exports.fetchArticles = () => {
+exports.fetchArticles = (sort = "created_at", order = "desc", topic = "") => {
   return db
     .query(
       `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes,
@@ -65,8 +65,9 @@ exports.fetchArticles = () => {
       FROM articles 
       LEFT JOIN comments 
       ON comments.article_id = articles.article_id
+      WHERE articles.topic like '%${topic}%'
       GROUP BY articles.article_id
-      ORDER BY created_at desc;`
+      ORDER BY ${sort} ${order};`
     )
     .then(({ rows }) => {
       return rows;
@@ -85,6 +86,33 @@ exports.fetchComments = (articleId) => {
       }
       return commentArray;
     });
+};
+exports.checkQueries = (sort = "created_at", order = "desc", topic = "") => {
+  const sortArray = [
+    "author",
+    "title",
+    "article_id",
+    "topic",
+    "created_at",
+    "votes",
+    "comment_count",
+  ];
+  const orderArray = ["desc", "asc"];
+
+  const topicArray = [""];
+
+  return db.query("SELECT * FROM topics").then(({ rows }) => {
+    rows.map((row) => {
+      topicArray.push(row["slug"]);
+    });
+    if (!sortArray.includes(sort)) {
+      return Promise.reject({ status: 400, msg: "invalid `sort_by` query" });
+    } else if (!orderArray.includes(order)) {
+      return Promise.reject({ status: 400, msg: "invalid `order` query" });
+    } else if (!topicArray.includes(topic)) {
+      return Promise.reject({ status: 404, msg: "non-existent `topic` query" });
+    }
+  });
 };
 
 exports.checkArticleId = (articleId) => {
@@ -113,7 +141,6 @@ exports.checkUserName = (username, articleId) => {
   return db
     .query("SELECT * FROM articles WHERE article_Id=$1", [articleId])
     .then(({ rows }) => {
-      console.log(rows);
       if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "No article found" });
       }
