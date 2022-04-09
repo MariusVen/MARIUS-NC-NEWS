@@ -184,7 +184,7 @@ describe("app", () => {
         });
     });
   });
-  describe.only("GET /api/articles", () => {
+  describe("GET /api/articles", () => {
     test("status: 200 - responds with array of articles objects with author, title, article_id, topic, created_at, votes properties  ", () => {
       return request(app)
         .get("/api/articles")
@@ -464,6 +464,38 @@ describe("app", () => {
               body: expect.any(String),
             })
           );
+        });
+    });
+  });
+  describe("DELETE /api/comments/:comment_id", () => {
+    test("Status 204, deletes comment from database ", () => {
+      const comment_id = 9;
+      return request(app)
+        .delete(`/api/comments/${comment_id}`)
+        .send(data)
+        .expect(204)
+        .then((res) => {
+          expect(res.body).toEqual({});
+        });
+    });
+    test(`Status 404, non existent ID, e.g 999`, () => {
+      const comment_id = 900;
+      return request(app)
+        .delete(`/api/comments/${comment_id}`)
+        .send(data)
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("non existent comment ID");
+        });
+    });
+    test(`Status 400, invalid ID, e.g "not-an-id"`, () => {
+      const comment_id = "bananas";
+      return request(app)
+        .delete(`/api/comments/${comment_id}`)
+        .send(data)
+        .expect(400)
+        .then((res) => {
+          expect(res.body.msg).toBe("invalid ID, e.g not-an-id");
         });
     });
   });

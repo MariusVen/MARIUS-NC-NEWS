@@ -11,6 +11,8 @@ const {
   checkUserName,
   checkQueries,
   checkTopicValid,
+  removeCommentByID,
+  checkCommentById,
 } = require("../models/models");
 
 exports.getTopics = (req, res) => {
@@ -89,6 +91,17 @@ exports.postComments = (req, res, next) => {
   ])
     .then((comment) => {
       res.status(201).send({ comment: comment[2] });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.deleteComment = (req, res, next) => {
+  const commentId = req.params.comment_id;
+  Promise.all([checkCommentById(commentId), removeCommentByID(commentId)])
+    .then((deletedComment) => {
+      res.status(204).send(deletedComment);
     })
     .catch((err) => {
       next(err);

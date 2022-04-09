@@ -31,7 +31,7 @@ exports.updateArticleByID = (voteToAdd, article_id) => {
   const newVote = voteToAdd.inc_votes;
   if (newVote === undefined) {
     return Promise.reject({ status: 400, msg: "missing required fields" });
-  } else if (typeof newVote != "number") {
+  } else if (isNaN(+newVote)) {
     return Promise.reject({
       status: 400,
       msg: "input property is incorrect type",
@@ -98,7 +98,6 @@ exports.checkQueries = (sort = "created_at", order = "desc", topic = "") => {
     "comment_count",
   ];
   const orderArray = ["desc", "asc"];
-
   const topicArray = [""];
 
   return db.query("SELECT * FROM topics").then(({ rows }) => {
@@ -157,5 +156,32 @@ exports.addComment = (username, body, articleId) => {
       if (rows.length === 0) {
         return Promise.reject({ status: 404, msg: "No article found" });
       } else return rows[0];
+    });
+};
+
+exports.removeCommentByID = (commentId) => {
+  if (isNaN(+commentId)) {
+    return Promise.reject({
+      status: 400,
+      msg: "invalid ID, e.g not-an-id",
+    });
+  } else {
+    return db
+      .query("DELETE FROM comments WHERE comment_Id =$1 RETURNING *;", [
+        commentId,
+      ])
+      .then(({ rows }) => {
+        return {};
+      });
+  }
+};
+
+exports.checkCommentById = (commentId) => {
+  return db
+    .query("SELECT * FROM comments WHERE comment_Id =$1", [commentId])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "non existent comment ID" });
+      }
     });
 };
