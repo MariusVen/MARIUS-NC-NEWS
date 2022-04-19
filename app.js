@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const {
   getTopics,
   getArticleById,
@@ -14,6 +15,7 @@ const { handlePsqlErrors, handleCustoms, handle500s } = require("./errors");
 const app = express();
 
 app.use(express.json());
+app.use(cors());
 
 app.get("/api/", getEndPoints);
 app.get("/api/topics", getTopics);
