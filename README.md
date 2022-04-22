@@ -1,4 +1,4 @@
-# Marius NC NEWS
+# Marius NC NEWS API
 I did create Marius NC News API as my backend portfolio project. This project provides data for my NC News frontend [app](https://marius-nc-news.netlify.app/)
 
 ## :rocket: Hosted version on Heroku
