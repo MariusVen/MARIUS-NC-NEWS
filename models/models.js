@@ -62,7 +62,7 @@ exports.fetchUsers = () => {
 exports.fetchArticles = (sort = "created_at", order = "desc", topic = "") => {
   return db
     .query(
-      `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes,
+      `SELECT articles.author, articles.title, articles.body, articles.article_id, articles.topic, articles.created_at, articles.votes,
       CAST(COUNT(comments.article_id) AS INT) AS comment_count 
       FROM articles 
       LEFT JOIN comments 
