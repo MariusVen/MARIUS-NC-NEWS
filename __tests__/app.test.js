@@ -192,6 +192,31 @@ describe("app", () => {
         });
     });
   });
+  describe("GET /api/users/:username", () => {
+    test("Status 200, responds with single user object", () => {
+      const username = "butter_bridge";
+      return request(app)
+        .get(`/api/users/${username}`)
+        .expect(200)
+        .then((res) => {
+          expect.objectContaining({
+            username: "butter_bridge",
+            name: "jonny",
+            avatar_url:
+              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+          });
+        });
+    });
+    test("Status 404, non existent username", () => {
+      const username = "anonymous";
+      return request(app)
+        .get(`/api/users/${username}`)
+        .expect(404)
+        .then((res) => {
+          expect(res.body.msg).toBe("user not found");
+        });
+    });
+  });
   describe("GET /api/articles", () => {
     test("Status 200, responds with array of articles objects with author, title, article_id, topic, created_at, votes properties  ", () => {
       return request(app)

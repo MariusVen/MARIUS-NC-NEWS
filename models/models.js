@@ -59,6 +59,18 @@ exports.fetchUsers = () => {
   });
 };
 
+exports.fetchUser = (username) => {
+  return db
+    .query(`SELECT * FROM users WHERE username=$1`, [username])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "user not found" });
+      } else {
+        return rows;
+      }
+    });
+};
+
 exports.fetchArticles = (sort = "created_at", order = "desc", topic = "") => {
   return db
     .query(

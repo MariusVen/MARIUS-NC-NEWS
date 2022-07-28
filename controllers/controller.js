@@ -13,6 +13,7 @@ const {
   checkTopicValid,
   removeCommentByID,
   checkCommentById,
+  fetchUser,
 } = require("../models/models");
 
 const endPoints = require("../endpoints.json");
@@ -50,6 +51,17 @@ exports.getUsers = (req, res) => {
   fetchUsers().then((users) => {
     res.status(200).send({ users: users });
   });
+};
+
+exports.getUser = (req, res, next) => {
+  const username = req.params.username;
+  fetchUser(username)
+    .then((user) => {
+      res.status(200).send({ user: user[0] });
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
 
 exports.getArticles = (req, res, next) => {
