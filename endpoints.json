@@ -126,6 +126,16 @@
     "description": "serves empty object of deleted comment",
     "exampleResponse": {}
   },
+  "GET /api/users/": {
+    "description": "serves an array of users",
+    "exampleResponse": {
+      "user": {
+        "username": "String",
+        "name": "String",
+        "avatar_url": "String"
+      }
+    }
+  },
   "GET /api/users/:username": {
     "description": "serves object of user",
     "exampleResponse": {
