@@ -55,7 +55,6 @@ exports.updateArticleByID = (voteToAdd, article_id) => {
 
 exports.fetchUsers = () => {
   return db.query("SELECT * FROM users").then(({ rows }) => {
-    console.log(rows);
     return rows;
   });
 };
